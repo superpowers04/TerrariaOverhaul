@@ -31,23 +31,27 @@ internal sealed class PlayerBodyRotation : ModPlayer
 		if (Player.sleeping.isSleeping) {
 			return;
 		}
-
 		// Do nothing for minecarts.
 		if (Player.mount is { Active: true, Cart: true }) {
 			return;
 		}
-
-		if (RotationOffsetScale != 0f && EnablePlayerTilting) {
-			float movementRotation = BodyTilting.CalculateRotationOffset(Player.velocity, Player.OnGround(), airMultiplier: 0.8f);
-
-			if (Player.mount.Active) {
-				// Reduce intensity on mounts.
-				movementRotation *= 0.5f;
+		if(EnablePlayerTilting){
+		
+			if (RotationOffsetScale != 0f) {
+				float movementRotation = BodyTilting.CalculateRotationOffset(Player.velocity, Player.OnGround(), airMultiplier: 0.8f);
+	
+				if (Player.mount.Active) {
+					// Reduce intensity on mounts.
+					movementRotation *= 0.5f;
+				}
+	
+				Rotation += movementRotation;
+	
+				//TODO: If swimming, multiply by 4.
 			}
-
-			Rotation += movementRotation;
-
-			//TODO: If swimming, multiply by 4.
+		// Prevents overriding rotation from other mods if player tilting is disabled and TO isn't providing it's own rotation
+		}else if(Rotation == 0f){
+			return;
 		}
 
 		Player.fullRotation = Rotation * Player.gravDir;
